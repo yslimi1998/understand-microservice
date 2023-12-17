@@ -1,0 +1,72 @@
+To understand Project Microservices:
+
+1-gateway-service:
+	
+il utilise la dependence de eureka-client pour se connecter avec discovery server(je peux l'ignorer) et spring-cloud-gateway(parceque c'est la gateway)
+et spring-config parcequ'on va placer sa configuration dans package config-service je vais utiliser egalament spring-actuator pour pouvoir utiliser
+les diferent endpont de actuator (/healthy.....). je vais egalement ajouter une Bean dans class main qui s'appelle:
+ @Bean
+    DiscoveryClientRouteDefinitionLocator locator(ReactiveDiscoveryClient rdc, DiscoveryLocatorProperties dlp) {
+        return new DiscoveryClientRouteDefinitionLocator(rdc, dlp);
+    }
+
+
+2- discovery-service:
+
+il utilise la depense de eureka-server parceque c'est le serveur ou les diferents micro-service vont etre s'enregistrer et spring-actuator et 
+egalement je vais ajouter @EnableEurekaServer dans la classe main.
+
+
+3-customer-service:
+
+normal entity;service;repository comme toujour est c'est un service client d'eureka egalement ajouter dependence du spring-config et spring-eureka 
+jpa ...
+
+
+4-account-service:
+
+normal comme customer-service et je vais ajouter une dependence du spring-cloud-openfeign parceque je vais appeller un service d'un autre micro-service
+et resilience-4j pour faire circuitbreaker ou cas ou l'apelle a un autre micro-service echoue ou bien l'autre service et en panne pour cree une method
+par default @FeignClient(name = "CUSTOMER-SERVICE") et     @CircuitBreaker(name="customerService", fallbackMethod = "getDefaultCustomer").
+
+
+5-config-service:
+
+ajiuter la dependence du spring-config-server et actuator et et eureka-client et je vais pointer dans application.properties ver dossier GIT qui va contenir
+le informations de configuration ... et ajouter cette annoation dans main class @EnableConfigServer
+
+
+6-config-repo: 
+
+dossier GIT qui contient les infos de config (il faut respecter nommage).
+
+7- Dockerize!
+
+pour docker dans tous les packages il faut ajouter fichier Dockerfile(fichier qui contient scripts) qui permet de cree Docker image qu'on peut 
+demmarer dans un container docker.
+
+apres dans le racine on va cree un fichier qui s'appelle docker-compose.yml je vais ecrir de script qui va builder des images et les runner dans un container
+par une simple command.
+
+
+Command:
+
+je dois etre placer dans le package (terminal et ouver dans le package)
+
+docker ps: pour savoir les container que j'ai .
+
+docker images: pour lister tous les images.
+
+docker build . -t nom:v1 pour cree image
+
+docker run -d -p 80:80 nom:v1 pour cree lancer image dans un container.
+
+docker stop nom.
+
+
+je dois etre placer dans le package pere (terminal et ouver dans le package qui contient docker-compose.yml)
+
+docker-compose up -d --build : on l'utilise pour docker-composer pour faire tous..
+
+docker-compose down: pour areter et sprimer.
+
